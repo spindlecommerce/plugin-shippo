@@ -163,9 +163,17 @@ const parcel = (settings: ShippoContext["settings"], weightGrams: number) => ({
 const quoteShipment = (ctx: ShippoContext, from: ShippoAddress, to: ShippoAddress, weightGrams: number, timeoutMs = RATE_TIMEOUT_MS) =>
   shippoRequest<ShippoShipment>(ctx, "POST", "/shipments/", { address_from: from, address_to: to, parcels: [parcel(ctx.settings, weightGrams)], async: false }, timeoutMs);
 
-const fractionDigits = (currency: string) => new Intl.NumberFormat("en", { style: "currency", currency }).resolvedOptions().maximumFractionDigits ?? 2;
-/** "5.50" USD → 550. */
-export const toMinorUnits = (amount: string, currency: string) => Math.round(Number(amount) * 10 ** fractionDigits(currency));
+/**
+ * Minor units per currency, as the platform stores amounts (Ecom's src/lib/money.ts): ISO 4217's
+ * exponents, 2 for any currency not listed. Intl's currency digits differ for some (HUF, IDR, COP
+ * and IQD, say), so they would be wrong here.
+ */
+const EXPONENTS: Record<string, number> = {
+  BHD: 3, BIF: 0, CLP: 0, DJF: 0, GNF: 0, IQD: 3, ISK: 0, JOD: 3, JPY: 0, KMF: 0, KRW: 0,
+  KWD: 3, LYD: 3, OMR: 3, PYG: 0, RWF: 0, TND: 3, UGX: 0, UYI: 0, VND: 0, VUV: 0, XAF: 0, XOF: 0, XPF: 0,
+};
+/** "5.50" USD → 550, "1500" HUF → 150000. */
+export const toMinorUnits = (amount: string, currency: string) => Math.round(Number(amount) * 10 ** (EXPONENTS[currency.toUpperCase()] ?? 2));
 
 const list = (value: unknown) => (typeof value === "string" ? value.split(",").map((s) => s.trim()).filter(Boolean) : []);
 const normalize = (name: string) => name.toLowerCase().replace(/[^a-z0-9]/g, "");

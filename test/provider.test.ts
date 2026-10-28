@@ -2,7 +2,7 @@ import { readFile } from "node:fs/promises";
 import type { PluginContext, RateRequest, ShipmentRequest } from "@spindlecommerce/plugin-sdk";
 import { describe, expect, it } from "vitest";
 import { shippo } from "../src/index.ts";
-import { checkConnection, shippoProvider, trackingUrl, type ShippoRate, type ShippoSettings } from "../src/provider.ts";
+import { checkConnection, shippoProvider, toMinorUnits, trackingUrl, type ShippoRate, type ShippoSettings } from "../src/provider.ts";
 
 const TOKEN = "shippo_test_abc123";
 const ADDRESS = { firstName: "Ana", lastName: "Silva", line1: "1 Broad St", city: "New York", regionCode: "NY", postalCode: "10004", countryCode: "US" };
@@ -206,5 +206,11 @@ describe("The plugin", () => {
   it("reports the package's version", async () => {
     const { version } = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8")) as { version: string };
     expect(shippo().version).toBe(version);
+  });
+});
+
+describe("Amounts", () => {
+  it("use the platform's minor units for every currency", () => {
+    expect([toMinorUnits("5.50", "USD"), toMinorUnits("1500", "JPY"), toMinorUnits("1.234", "KWD"), toMinorUnits("1500", "HUF")]).toEqual([550, 1500, 1234, 150_000]);
   });
 });

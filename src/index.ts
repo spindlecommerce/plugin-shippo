@@ -9,7 +9,7 @@ export const shippo = () =>
   definePlugin({
     name: "shippo",
     // The package's version (a test keeps them equal), shown in the admin.
-    version: "1.0.0",
+    version: "1.0.1",
     // The plugin API this was written for, as a number: PLUGIN_API_VERSION would be the
     // installation's own, so it would always match.
     apiVersion: 1,

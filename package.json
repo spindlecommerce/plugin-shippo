@@ -1,6 +1,6 @@
 {
   "name": "@spindlecommerce/plugin-shippo",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Shippo for SpindleCommerce: live carrier rates at checkout (USPS, UPS, FedEx, DHL and more) and shipping labels when you fulfil orders.",
   "keywords": [
     "spindlecommerce",
